@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>robotocore coverage dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1117; --surface: #161b22; --surface2: #1c2129;
+  --border: #30363d; --text: #c9d1d9; --text-dim: #8b949e; --text-bright: #f0f6fc;
+  --native: #f0c040; --moto: #3fb950; --red: #f85149; --yellow: #d29922;
+  --accent: #58a6ff;
+}
+html { font-size: 14px; }
+body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: var(--text); min-height: 100vh; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+
+/* Header */
+header { border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+header h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-bright); }
+header h1 span { color: var(--text-dim); font-weight: 400; }
+.header-meta { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem; }
+
+/* Tabs */
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
+.tab { padding: 0.75rem 1.25rem; cursor: pointer; color: var(--text-dim); border-bottom: 2px solid transparent;
+  font-family: inherit; font-size: 0.85rem; background: none; border-top: none; border-left: none; border-right: none; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--text-bright); border-bottom-color: var(--accent); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Summary cards */
+.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+.stat-card .label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-card .value { font-size: 1.75rem; font-weight: 700; color: var(--text-bright); margin-top: 0.25rem; }
+.stat-card .sub { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem; }
+
+/* Coverage bar (small) */
+.coverage-bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.coverage-bar .fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+
+/* Controls */
+.controls { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; align-items: center; }
+.filter-group { display: flex; gap: 2px; }
+.filter-btn { padding: 0.4rem 0.75rem; font-family: inherit; font-size: 0.75rem; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text-dim); cursor: pointer; border-radius: 4px; }
+.filter-btn:hover { color: var(--text); }
+.filter-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+select, input[type="text"] { padding: 0.4rem 0.6rem; font-family: inherit; font-size: 0.75rem;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 4px; }
+select { cursor: pointer; }
+input[type="text"] { width: 200px; }
+input[type="text"]::placeholder { color: var(--text-dim); }
+.toggle-label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--text-dim); cursor: pointer; }
+.toggle-label input { accent-color: var(--accent); }
+
+/* Service list */
+.service-list { display: flex; flex-direction: column; gap: 2px; }
+.service-row { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: border-color 0.15s; }
+.service-row:hover { border-color: var(--text-dim); }
+.service-row.expanded { border-color: var(--accent); }
+.service-header { display: grid; grid-template-columns: 1fr auto auto auto auto; align-items: center; gap: 1rem; padding: 0.75rem 1rem; }
+.service-name { font-weight: 600; color: var(--text-bright); font-size: 0.85rem; }
+.badge { font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 3px; font-weight: 600; text-transform: uppercase; }
+.badge.native { background: rgba(240,192,64,0.15); color: var(--native); }
+.badge.moto { background: rgba(63,185,80,0.15); color: var(--moto); }
+.category-tag { font-size: 0.65rem; color: var(--text-dim); }
+.ops-count { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.service-coverage { width: 120px; display: flex; align-items: center; gap: 0.5rem; }
+.service-coverage .pct { font-size: 0.75rem; font-weight: 600; min-width: 3em; text-align: right; }
+.service-coverage .coverage-bar { flex: 1; }
+.chevron { font-size: 0.75rem; color: var(--text-dim); transition: transform 0.2s; }
+.service-row.expanded .chevron { transform: rotate(90deg); }
+
+/* Operations panel */
+.ops-panel { display: none; padding: 0.75rem 1rem; border-top: 1px solid var(--border); }
+.service-row.expanded .ops-panel { display: block; }
+.ops-grid { display: flex; flex-wrap: wrap; gap: 0.3rem; max-height: 300px; overflow-y: auto; }
+.op-item { font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 3px; white-space: nowrap; }
+.op-item.implemented { background: rgba(63,185,80,0.12); color: var(--moto); }
+.op-item.missing { background: rgba(248,81,73,0.12); color: var(--red); }
+.ops-summary { font-size: 0.7rem; color: var(--text-dim); margin-bottom: 0.5rem; }
+
+/* Treemap */
+#treemap-container { position: relative; width: 100%; aspect-ratio: 16/9; min-height: 400px; }
+#treemap-canvas { width: 100%; height: 100%; border-radius: 8px; border: 1px solid var(--border); }
+#treemap-tooltip { position: absolute; display: none; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 0.75rem; font-size: 0.75rem; pointer-events: none; z-index: 10;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4); max-width: 250px; }
+#treemap-tooltip .tt-name { font-weight: 700; color: var(--text-bright); margin-bottom: 0.25rem; }
+#treemap-tooltip .tt-cat { font-size: 0.65rem; color: var(--text-dim); margin-bottom: 0.4rem; }
+#treemap-tooltip .tt-stat { color: var(--text); }
+
+/* Footer */
+footer { border-top: 1px solid var(--border); margin-top: 2rem; padding-top: 1rem; font-size: 0.7rem; color: var(--text-dim);
+  display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; }
+
+/* Loading & Error */
+.loading, .error { text-align: center; padding: 4rem 1rem; }
+.loading { color: var(--text-dim); }
+.error { color: var(--red); }
+.spinner { display: inline-block; width: 24px; height: 24px; border: 2px solid var(--border);
+  border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 1rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.no-results { text-align: center; padding: 2rem; color: var(--text-dim); font-size: 0.85rem; }
+
+@media (max-width: 768px) {
+  .summary { grid-template-columns: repeat(2, 1fr); }
+  .service-header { grid-template-columns: 1fr; gap: 0.4rem; }
+  .service-coverage { width: 100%; }
+  .controls { flex-direction: column; align-items: stretch; }
+  input[type="text"] { width: 100%; }
+  #treemap-container { aspect-ratio: 4/3; }
+}
+@media (max-width: 480px) {
+  .container { padding: 1rem; }
+  .summary { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>robotocore <span>coverage</span></h1>
+    <div class="header-meta" id="header-meta"></div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="parity">Parity Report</button>
+    <button class="tab" data-tab="treemap">Coverage Treemap</button>
+  </div>
+
+  <div id="loading" class="loading"><div class="spinner"></div><div>Loading coverage data...</div></div>
+  <div id="error" class="error" style="display:none"></div>
+
+  <div id="parity" class="tab-content" style="display:none">
+    <div class="summary" id="summary"></div>
+    <div class="controls" id="controls">
+      <div class="filter-group" id="provider-filters">
+        <button class="filter-btn active" data-provider="all">All</button>
+        <button class="filter-btn" data-provider="native">Native</button>
+        <button class="filter-btn" data-provider="moto">Moto</button>
+      </div>
+      <select id="category-filter"><option value="all">All Categories</option></select>
+      <select id="sort-select">
+        <option value="name">Sort: Name</option>
+        <option value="coverage-desc">Sort: Coverage ↓</option>
+        <option value="coverage-asc">Sort: Coverage ↑</option>
+        <option value="ops-desc">Sort: Ops ↓</option>
+      </select>
+      <label class="toggle-label"><input type="checkbox" id="incomplete-toggle"> Incomplete only</label>
+      <input type="text" id="search" placeholder="Search services...">
+    </div>
+    <div class="service-list" id="service-list"></div>
+  </div>
+
+  <div id="treemap" class="tab-content">
+    <div id="treemap-container">
+      <canvas id="treemap-canvas"></canvas>
+      <div id="treemap-tooltip"></div>
+    </div>
+  </div>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+(function() {
+  let DATA = null;
+  let treemapTiles = [];
+
+  // --- Data loading ---
+  fetch('data/coverage.json')
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(data => { DATA = data; init(); })
+    .catch(err => {
+      document.getElementById('loading').style.display = 'none';
+      const el = document.getElementById('error');
+      el.style.display = 'block';
+      el.textContent = 'Failed to load coverage data: ' + err.message;
+    });
+
+  function init() {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('parity').style.removeProperty('display');
+    document.getElementById('parity').classList.add('active');
+    renderHeader();
+    renderSummary();
+    populateCategories();
+    renderServices();
+    setupControls();
+    setupTabs();
+    renderFooter();
+  }
+
+  // --- Header ---
+  function renderHeader() {
+    const d = new Date(DATA.generated_at);
+    document.getElementById('header-meta').innerHTML =
+      `Updated ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} &middot; ` +
+      `<a href="https://github.com/robotocore/robotocore">${DATA.robotocore_version}</a>`;
+  }
+
+  // --- Summary ---
+  function renderSummary() {
+    const s = DATA.summary;
+    document.getElementById('summary').innerHTML = `
+      <div class="stat-card">
+        <div class="label">Total Services</div>
+        <div class="value">${s.total_services}</div>
+        <div class="sub">${s.native_services} native &middot; ${s.moto_services} moto</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Coverage</div>
+        <div class="value">${s.coverage_pct}%</div>
+        <div class="coverage-bar"><div class="fill" style="width:${s.coverage_pct}%;background:${coverageColor(s.coverage_pct)}"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Operations Implemented</div>
+        <div class="value">${s.implemented_ops.toLocaleString()}</div>
+        <div class="sub">of ${s.total_ops.toLocaleString()} total</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Native Ops</div>
+        <div class="value">${DATA.services.filter(s=>s.provider==='native').reduce((a,s)=>a+s.implemented_ops,0).toLocaleString()}</div>
+        <div class="sub">across ${s.native_services} services</div>
+      </div>`;
+  }
+
+  // --- Categories ---
+  function populateCategories() {
+    const cats = [...new Set(DATA.services.map(s => s.category))].sort();
+    const sel = document.getElementById('category-filter');
+    cats.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o); });
+  }
+
+  // --- Service List ---
+  function renderServices() {
+    const list = document.getElementById('service-list');
+    const filtered = getFilteredServices();
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="no-results">No services match your filters.</div>';
+      return;
+    }
+    list.innerHTML = filtered.map(s => `
+      <div class="service-row" data-service="${s.name}">
+        <div class="service-header">
+          <div><span class="service-name">${s.name}</span></div>
+          <span class="badge ${s.provider}">${s.provider}</span>
+          <span class="category-tag">${s.category}</span>
+          <div class="service-coverage">
+            <span class="pct" style="color:${coverageColor(s.coverage_pct)}">${s.coverage_pct}%</span>
+            <div class="coverage-bar"><div class="fill" style="width:${s.coverage_pct}%;background:${coverageColor(s.coverage_pct)}"></div></div>
+          </div>
+          <span class="ops-count">${s.implemented_ops}/${s.total_ops}</span>
+        </div>
+        <div class="ops-panel">
+          <div class="ops-summary">${s.implemented_ops} implemented, ${s.total_ops - s.implemented_ops} missing</div>
+          <div class="ops-grid">${s.operations.map(op =>
+            `<span class="op-item ${op.implemented ? 'implemented' : 'missing'}">${op.implemented ? '&#10003;' : '&#10007;'} ${op.name}</span>`
+          ).join('')}</div>
+        </div>
+      </div>`).join('');
+
+    list.querySelectorAll('.service-row').forEach(row => {
+      row.querySelector('.service-header').addEventListener('click', () => {
+        const wasExpanded = row.classList.contains('expanded');
+        list.querySelectorAll('.service-row.expanded').forEach(r => r.classList.remove('expanded'));
+        if (!wasExpanded) row.classList.add('expanded');
+      });
+    });
+  }
+
+  function getFilteredServices() {
+    let services = [...DATA.services];
+    const provider = document.querySelector('#provider-filters .filter-btn.active')?.dataset.provider || 'all';
+    const category = document.getElementById('category-filter').value;
+    const incomplete = document.getElementById('incomplete-toggle').checked;
+    const search = document.getElementById('search').value.toLowerCase().trim();
+    const sort = document.getElementById('sort-select').value;
+
+    if (provider !== 'all') services = services.filter(s => s.provider === provider);
+    if (category !== 'all') services = services.filter(s => s.category === category);
+    if (incomplete) services = services.filter(s => s.coverage_pct < 100);
+    if (search) services = services.filter(s => s.name.includes(search) || (s.description && s.description.toLowerCase().includes(search)));
+
+    switch (sort) {
+      case 'name': services.sort((a, b) => a.name.localeCompare(b.name)); break;
+      case 'coverage-desc': services.sort((a, b) => b.coverage_pct - a.coverage_pct); break;
+      case 'coverage-asc': services.sort((a, b) => a.coverage_pct - b.coverage_pct); break;
+      case 'ops-desc': services.sort((a, b) => b.total_ops - a.total_ops); break;
+    }
+    return services;
+  }
+
+  // --- Controls ---
+  function setupControls() {
+    document.querySelectorAll('#provider-filters .filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#provider-filters .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderServices();
+      });
+    });
+    document.getElementById('category-filter').addEventListener('change', renderServices);
+    document.getElementById('sort-select').addEventListener('change', renderServices);
+    document.getElementById('incomplete-toggle').addEventListener('change', renderServices);
+    let debounce;
+    document.getElementById('search').addEventListener('input', () => { clearTimeout(debounce); debounce = setTimeout(renderServices, 200); });
+  }
+
+  // --- Tabs ---
+  function setupTabs() {
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        const target = document.getElementById(tab.dataset.tab);
+        target.classList.add('active');
+        if (tab.dataset.tab === 'treemap') drawTreemap();
+      });
+    });
+  }
+
+  // --- Footer ---
+  function renderFooter() {
+    const d = new Date(DATA.generated_at);
+    document.getElementById('footer').innerHTML =
+      `<span>Generated ${d.toISOString().slice(0,16).replace('T',' ')} UTC</span>` +
+      `<span>${DATA.robotocore_version}</span>` +
+      `<a href="https://github.com/robotocore/robotocore">github.com/robotocore/robotocore</a>`;
+  }
+
+  // --- Color helpers ---
+  function coverageColor(pct) {
+    if (pct <= 50) {
+      const t = pct / 50;
+      return lerpColor('#f85149', '#d29922', t);
+    } else {
+      const t = (pct - 50) / 50;
+      return lerpColor('#d29922', '#3fb950', t);
+    }
+  }
+  function lerpColor(a, b, t) {
+    const ah = parseInt(a.slice(1), 16), bh = parseInt(b.slice(1), 16);
+    const ar = (ah >> 16) & 0xff, ag = (ah >> 8) & 0xff, ab = ah & 0xff;
+    const br = (bh >> 16) & 0xff, bg = (bh >> 8) & 0xff, bb = bh & 0xff;
+    const r = Math.round(ar + (br - ar) * t);
+    const g = Math.round(ag + (bg - ag) * t);
+    const bl = Math.round(ab + (bb - ab) * t);
+    return `rgb(${r},${g},${bl})`;
+  }
+
+  // --- Treemap ---
+  function drawTreemap() {
+    const canvas = document.getElementById('treemap-canvas');
+    const container = document.getElementById('treemap-container');
+    const dpr = window.devicePixelRatio || 1;
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
+    ctx.fillRect(0, 0, w, h);
+
+    // Group by category
+    const catMap = {};
+    DATA.services.forEach(s => {
+      if (!catMap[s.category]) catMap[s.category] = [];
+      catMap[s.category].push(s);
+    });
+    const categories = Object.keys(catMap).sort().map(cat => {
+      const svcs = catMap[cat];
+      const area = svcs.reduce((a, s) => a + Math.sqrt(Math.max(s.total_ops, 1)), 0);
+      return { name: cat, area, services: svcs };
+    });
+
+    // Layout categories
+    const catRects = squarify(categories.map(c => c.area), { x: 4, y: 4, w: w - 8, h: h - 8 });
+    treemapTiles = [];
+
+    categories.forEach((cat, i) => {
+      const rect = catRects[i];
+      // Category border
+      ctx.strokeStyle = '#30363d';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+
+      // Layout services within category
+      const svcAreas = cat.services
+        .sort((a, b) => b.total_ops - a.total_ops)
+        .map(s => Math.sqrt(Math.max(s.total_ops, 1)));
+      const pad = 2;
+      const inner = { x: rect.x + pad, y: rect.y + pad, w: rect.w - pad * 2, h: rect.h - pad * 2 };
+      if (inner.w <= 0 || inner.h <= 0) return;
+      const svcRects = squarify(svcAreas, inner);
+
+      cat.services.forEach((svc, j) => {
+        if (j >= svcRects.length) return;
+        const r = svcRects[j];
+        const color = coverageColor(svc.coverage_pct);
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.8;
+        ctx.fillRect(r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1);
+        ctx.globalAlpha = 1;
+
+        // Label
+        if (r.w > 50 && r.h > 18) {
+          ctx.fillStyle = '#0d1117';
+          ctx.font = `600 ${Math.min(11, r.h * 0.35)}px 'JetBrains Mono', monospace`;
+          ctx.textBaseline = 'middle';
+          const label = svc.name.length > r.w / 7 ? svc.name.slice(0, Math.floor(r.w / 7)) + '..' : svc.name;
+          ctx.fillText(label, r.x + 4, r.y + r.h / 2);
+        }
+
+        treemapTiles.push({ ...r, service: svc, category: cat.name });
+      });
+    });
+
+    // Tooltip
+    setupTreemapTooltip(canvas, container, w, h);
+  }
+
+  function setupTreemapTooltip(canvas, container, w, h) {
+    const tooltip = document.getElementById('treemap-tooltip');
+    canvas.onmousemove = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      const tile = treemapTiles.find(t => mx >= t.x && mx <= t.x + t.w && my >= t.y && my <= t.y + t.h);
+      if (tile) {
+        const s = tile.service;
+        tooltip.innerHTML = `
+          <div class="tt-name">${s.name}</div>
+          <div class="tt-cat">${tile.category} &middot; ${s.provider}</div>
+          <div class="tt-stat">${s.implemented_ops}/${s.total_ops} ops (${s.coverage_pct}%)</div>`;
+        tooltip.style.display = 'block';
+        let tx = mx + 12, ty = my - 10;
+        if (tx + 250 > w) tx = mx - 260;
+        if (ty + 80 > h) ty = my - 80;
+        tooltip.style.left = Math.max(0, tx) + 'px';
+        tooltip.style.top = Math.max(0, ty) + 'px';
+      } else {
+        tooltip.style.display = 'none';
+      }
+    };
+    canvas.onmouseleave = () => { tooltip.style.display = 'none'; };
+  }
+
+  // Squarified treemap layout algorithm
+  function squarify(areas, rect) {
+    const total = areas.reduce((a, v) => a + v, 0);
+    if (total === 0 || areas.length === 0) return [];
+    const rects = [];
+    const items = areas.map((a, i) => ({ area: a, index: i })).sort((a, b) => b.area - a.area);
+    layoutStrip(items, { ...rect }, total, rects);
+    return rects;
+  }
+
+  function layoutStrip(items, rect, totalArea, rects) {
+    if (items.length === 0) return;
+    if (items.length === 1) {
+      rects[items[0].index] = { x: rect.x, y: rect.y, w: rect.w, h: rect.h };
+      return;
+    }
+
+    const scale = (rect.w * rect.h) / totalArea;
+    const isWide = rect.w >= rect.h;
+    const side = isWide ? rect.h : rect.w;
+
+    let row = [items[0]];
+    let rowArea = items[0].area * scale;
+
+    for (let i = 1; i < items.length; i++) {
+      const newArea = rowArea + items[i].area * scale;
+      if (worstRatio(row, rowArea, side) >= worstRatio([...row, items[i]], newArea, side)) {
+        row.push(items[i]);
+        rowArea = newArea;
+      } else {
+        break;
+      }
+    }
+
+    // Lay out the row
+    const rowLen = rowArea / side;
+    let offset = 0;
+    row.forEach(item => {
+      const itemSize = (item.area * scale) / rowLen;
+      if (isWide) {
+        rects[item.index] = { x: rect.x, y: rect.y + offset, w: rowLen, h: itemSize };
+      } else {
+        rects[item.index] = { x: rect.x + offset, y: rect.y, w: itemSize, h: rowLen };
+      }
+      offset += itemSize;
+    });
+
+    // Recurse on remaining
+    const remaining = items.slice(row.length);
+    const remainingArea = totalArea - row.reduce((a, it) => a + it.area, 0);
+    if (remaining.length > 0) {
+      const newRect = isWide
+        ? { x: rect.x + rowLen, y: rect.y, w: rect.w - rowLen, h: rect.h }
+        : { x: rect.x, y: rect.y + rowLen, w: rect.w, h: rect.h - rowLen };
+      layoutStrip(remaining, newRect, remainingArea, rects);
+    }
+  }
+
+  function worstRatio(row, totalArea, side) {
+    if (row.length === 0 || totalArea === 0 || side === 0) return Infinity;
+    const rowLen = totalArea / side;
+    if (rowLen === 0) return Infinity;
+    let worst = 0;
+    const scale = 1; // areas already scaled
+    row.forEach(item => {
+      // We need individual area; approximate from ratio
+    });
+    // Simpler: compute aspect ratios
+    let sum = 0;
+    row.forEach(r => sum += r.area);
+    let maxRatio = 0;
+    row.forEach(r => {
+      const frac = r.area / sum;
+      const w = rowLen;
+      const h = frac * totalArea / rowLen;
+      const ratio = Math.max(w / h, h / w);
+      if (ratio > maxRatio) maxRatio = ratio;
+    });
+    return maxRatio;
+  }
+
+  // Resize observer for treemap
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(() => {
+      if (DATA && document.getElementById('treemap').classList.contains('active')) drawTreemap();
+    }).observe(document.getElementById('treemap-container'));
+  }
+})();
+</script>
+</body>
+</html>
