@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-07-11T07:45:45.533035+00:00",
-  "robotocore_version": "50175db",
+  "generated_at": "2026-07-12T08:06:39.167252+00:00",
+  "robotocore_version": "v2026.7.12.3",
   "summary": {
     "total_services": 157,
     "native_services": 46,
     "moto_services": 111,
     "total_ops": 9540,
-    "implemented_ops": 684,
+    "implemented_ops": 688,
     "coverage_pct": 7.2
   },
   "services": [
@@ -16904,8 +16904,8 @@
       "category": "App Integration",
       "description": "EventBridge with cross-service target invocation",
       "total_ops": 57,
-      "implemented_ops": 39,
-      "coverage_pct": 68.4,
+      "implemented_ops": 43,
+      "coverage_pct": 75.4,
       "operations": [
         {
           "name": "ActivateEventSource",
@@ -16989,7 +16989,7 @@
         },
         {
           "name": "DescribeEndpoint",
-          "implemented": false
+          "implemented": true
         },
         {
           "name": "DescribeEventBus",
@@ -17021,7 +17021,7 @@
         },
         {
           "name": "ListApiDestinations",
-          "implemented": false
+          "implemented": true
         },
         {
           "name": "ListArchives",
@@ -17029,11 +17029,11 @@
         },
         {
           "name": "ListConnections",
-          "implemented": false
+          "implemented": true
         },
         {
           "name": "ListEndpoints",
-          "implemented": false
+          "implemented": true
         },
         {
           "name": "ListEventBuses",
