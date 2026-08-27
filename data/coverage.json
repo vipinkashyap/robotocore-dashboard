@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-26T06:09:29.452379+00:00",
-  "robotocore_version": "v2026.8.25.1",
+  "generated_at": "2026-08-27T09:03:52.543888+00:00",
+  "robotocore_version": "2e379e2",
   "summary": {
-    "total_services": 157,
+    "total_services": 156,
     "native_services": 46,
-    "moto_services": 111,
-    "total_ops": 9540,
+    "moto_services": 110,
+    "total_ops": 9506,
     "implemented_ops": 693,
     "coverage_pct": 7.3
   },
@@ -27231,153 +27231,6 @@
         },
         {
           "name": "ValidatePipeline",
-          "implemented": false
-        }
-      ]
-    },
-    {
-      "name": "panorama",
-      "provider": "moto",
-      "category": "Media",
-      "description": "Panorama",
-      "total_ops": 34,
-      "implemented_ops": 0,
-      "coverage_pct": 0.0,
-      "operations": [
-        {
-          "name": "CreateApplicationInstance",
-          "implemented": false
-        },
-        {
-          "name": "CreateJobForDevices",
-          "implemented": false
-        },
-        {
-          "name": "CreateNodeFromTemplateJob",
-          "implemented": false
-        },
-        {
-          "name": "CreatePackage",
-          "implemented": false
-        },
-        {
-          "name": "CreatePackageImportJob",
-          "implemented": false
-        },
-        {
-          "name": "DeleteDevice",
-          "implemented": false
-        },
-        {
-          "name": "DeletePackage",
-          "implemented": false
-        },
-        {
-          "name": "DeregisterPackageVersion",
-          "implemented": false
-        },
-        {
-          "name": "DescribeApplicationInstance",
-          "implemented": false
-        },
-        {
-          "name": "DescribeApplicationInstanceDetails",
-          "implemented": false
-        },
-        {
-          "name": "DescribeDevice",
-          "implemented": false
-        },
-        {
-          "name": "DescribeDeviceJob",
-          "implemented": false
-        },
-        {
-          "name": "DescribeNode",
-          "implemented": false
-        },
-        {
-          "name": "DescribeNodeFromTemplateJob",
-          "implemented": false
-        },
-        {
-          "name": "DescribePackage",
-          "implemented": false
-        },
-        {
-          "name": "DescribePackageImportJob",
-          "implemented": false
-        },
-        {
-          "name": "DescribePackageVersion",
-          "implemented": false
-        },
-        {
-          "name": "ListApplicationInstanceDependencies",
-          "implemented": false
-        },
-        {
-          "name": "ListApplicationInstanceNodeInstances",
-          "implemented": false
-        },
-        {
-          "name": "ListApplicationInstances",
-          "implemented": false
-        },
-        {
-          "name": "ListDevices",
-          "implemented": false
-        },
-        {
-          "name": "ListDevicesJobs",
-          "implemented": false
-        },
-        {
-          "name": "ListNodeFromTemplateJobs",
-          "implemented": false
-        },
-        {
-          "name": "ListNodes",
-          "implemented": false
-        },
-        {
-          "name": "ListPackageImportJobs",
-          "implemented": false
-        },
-        {
-          "name": "ListPackages",
-          "implemented": false
-        },
-        {
-          "name": "ListTagsForResource",
-          "implemented": false
-        },
-        {
-          "name": "ProvisionDevice",
-          "implemented": false
-        },
-        {
-          "name": "RegisterPackageVersion",
-          "implemented": false
-        },
-        {
-          "name": "RemoveApplicationInstance",
-          "implemented": false
-        },
-        {
-          "name": "SignalApplicationInstanceNodeInstances",
-          "implemented": false
-        },
-        {
-          "name": "TagResource",
-          "implemented": false
-        },
-        {
-          "name": "UntagResource",
-          "implemented": false
-        },
-        {
-          "name": "UpdateDeviceMetadata",
           "implemented": false
         }
       ]
