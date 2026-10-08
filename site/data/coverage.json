@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-10-07T12:28:33.179612+00:00",
-  "robotocore_version": "2e379e2",
+  "generated_at": "2026-10-08T12:37:58.546149+00:00",
+  "robotocore_version": "9752b94",
   "summary": {
     "total_services": 156,
-    "native_services": 46,
-    "moto_services": 110,
+    "native_services": 48,
+    "moto_services": 108,
     "total_ops": 9506,
-    "implemented_ops": 693,
+    "implemented_ops": 698,
     "coverage_pct": 7.3
   },
   "services": [
@@ -6739,8 +6739,8 @@
       "category": "Security",
       "description": "Cognito Identity Provider",
       "total_ops": 122,
-      "implemented_ops": 53,
-      "coverage_pct": 43.4,
+      "implemented_ops": 54,
+      "coverage_pct": 44.3,
       "operations": [
         {
           "name": "AddCustomAttributes",
@@ -6928,7 +6928,7 @@
         },
         {
           "name": "DeleteResourceServer",
-          "implemented": false
+          "implemented": true
         },
         {
           "name": "DeleteTerms",
@@ -16904,8 +16904,8 @@
       "category": "App Integration",
       "description": "EventBridge with cross-service target invocation",
       "total_ops": 57,
-      "implemented_ops": 43,
-      "coverage_pct": 75.4,
+      "implemented_ops": 44,
+      "coverage_pct": 77.2,
       "operations": [
         {
           "name": "ActivateEventSource",
@@ -17133,7 +17133,7 @@
         },
         {
           "name": "UpdateEventBus",
-          "implemented": false
+          "implemented": true
         }
       ]
     },
@@ -23202,8 +23202,8 @@
       "category": "Compute",
       "description": "Lambda with in-process Python execution",
       "total_ops": 85,
-      "implemented_ops": 44,
-      "coverage_pct": 51.8,
+      "implemented_ops": 45,
+      "coverage_pct": 52.9,
       "operations": [
         {
           "name": "AddLayerVersionPermission",
@@ -23355,7 +23355,7 @@
         },
         {
           "name": "GetLayerVersionByArn",
-          "implemented": false
+          "implemented": true
         },
         {
           "name": "GetLayerVersionPolicy",
@@ -26875,12 +26875,12 @@
     },
     {
       "name": "organizations",
-      "provider": "moto",
+      "provider": "native",
       "category": "Management",
       "description": "AWS Organizations",
       "total_ops": 63,
-      "implemented_ops": 0,
-      "coverage_pct": 0.0,
+      "implemented_ops": 1,
+      "coverage_pct": 1.6,
       "operations": [
         {
           "name": "AcceptHandshake",
@@ -26888,7 +26888,7 @@
         },
         {
           "name": "AttachPolicy",
-          "implemented": false
+          "implemented": true
         },
         {
           "name": "CancelHandshake",
@@ -29060,7 +29060,7 @@
     },
     {
       "name": "ram",
-      "provider": "moto",
+      "provider": "native",
       "category": "Security",
       "description": "Resource Access Manager",
       "total_ops": 35,
@@ -31197,8 +31197,8 @@
       "category": "Networking",
       "description": "Route 53",
       "total_ops": 71,
-      "implemented_ops": 30,
-      "coverage_pct": 42.3,
+      "implemented_ops": 31,
+      "coverage_pct": 43.7,
       "operations": [
         {
           "name": "ActivateKeySigningKey",
@@ -31326,7 +31326,7 @@
         },
         {
           "name": "GetDNSSEC",
-          "implemented": false
+          "implemented": true
         },
         {
           "name": "GetGeoLocation",
