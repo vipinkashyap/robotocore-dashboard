@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-10-09T12:25:18.878915+00:00",
-  "robotocore_version": "v2026.10.8.3",
+  "generated_at": "2026-10-10T11:44:21.060148+00:00",
+  "robotocore_version": "v2026.10.10.12",
   "summary": {
     "total_services": 156,
     "native_services": 48,
     "moto_services": 108,
     "total_ops": 9506,
-    "implemented_ops": 698,
-    "coverage_pct": 7.3
+    "implemented_ops": 699,
+    "coverage_pct": 7.4
   },
   "services": [
     {
@@ -31922,8 +31922,8 @@
       "category": "Storage",
       "description": "S3 with event notifications",
       "total_ops": 111,
-      "implemented_ops": 2,
-      "coverage_pct": 1.8,
+      "implemented_ops": 3,
+      "coverage_pct": 2.7,
       "operations": [
         {
           "name": "AbortMultipartUpload",
@@ -32135,7 +32135,7 @@
         },
         {
           "name": "GetObject",
-          "implemented": false
+          "implemented": true
         },
         {
           "name": "GetObjectAcl",
