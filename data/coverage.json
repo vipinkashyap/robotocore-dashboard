@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-10-30T11:58:10.638386+00:00",
-  "robotocore_version": "v2.0.2",
+  "generated_at": "2026-10-31T11:32:25.328010+00:00",
+  "robotocore_version": "v2026.10.30.4",
   "summary": {
     "total_services": 159,
     "native_services": 0,
     "moto_services": 0,
     "total_ops": 10357,
-    "implemented_ops": 9897,
+    "implemented_ops": 9899,
     "coverage_pct": 95.6
   },
   "services": [
@@ -25170,8 +25170,8 @@
       "category": "Management",
       "description": "",
       "total_ops": 108,
-      "implemented_ops": 106,
-      "coverage_pct": 98.1,
+      "implemented_ops": 108,
+      "coverage_pct": 100.0,
       "operations": [
         {
           "name": "AssociateKmsKey",
@@ -25419,7 +25419,7 @@
         },
         {
           "name": "GetLogObject",
-          "implemented": false
+          "implemented": true
         },
         {
           "name": "GetLogRecord",
@@ -25555,7 +25555,7 @@
         },
         {
           "name": "StartLiveTail",
-          "implemented": false
+          "implemented": true
         },
         {
           "name": "StartQuery",
