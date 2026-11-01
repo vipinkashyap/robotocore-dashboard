@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-10-31T11:32:25.328010+00:00",
-  "robotocore_version": "v2026.10.30.4",
+  "generated_at": "2026-11-01T12:29:46.652817+00:00",
+  "robotocore_version": "fac483d",
   "summary": {
     "total_services": 159,
     "native_services": 0,
     "moto_services": 0,
     "total_ops": 10357,
-    "implemented_ops": 9899,
+    "implemented_ops": 9901,
     "coverage_pct": 95.6
   },
   "services": [
@@ -12338,8 +12338,8 @@
       "category": "Database",
       "description": "",
       "total_ops": 56,
-      "implemented_ops": 54,
-      "coverage_pct": 96.4,
+      "implemented_ops": 56,
+      "coverage_pct": 100.0,
       "operations": [
         {
           "name": "BatchExecuteStatement",
@@ -12523,7 +12523,7 @@
         },
         {
           "name": "TransactWriteItems",
-          "implemented": false
+          "implemented": true
         },
         {
           "name": "UntagResource",
@@ -12555,7 +12555,7 @@
         },
         {
           "name": "UpdateTable",
-          "implemented": false
+          "implemented": true
         },
         {
           "name": "UpdateTableReplicaAutoScaling",
